@@ -4,16 +4,16 @@ import (
 	"fmt"
 )
 
-type UrlMapping struct {
+type URLMapping struct {
 	LongURL  string
 	ShortURL string
 }
 
-var urlMap = make(map[string]UrlMapping)
+var urlMap = make(map[string]URLMapping)
 
 func GenerateShortURL(longURL string) (string, error) {
 	shortURL := fmt.Sprintf("%x", len(urlMap)+1)
-	urlMap[shortURL] = UrlMapping{LongURL: longURL, ShortURL: shortURL}
+	urlMap[shortURL] = URLMapping{LongURL: longURL, ShortURL: shortURL}
 	return shortURL, nil
 }
 

@@ -2,20 +2,26 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 
 	"github.com/SAgamyradov/yandexService.git/internal/app/handler"
+	"github.com/SAgamyradov/yandexService.git/internal/app/repository"
 	"github.com/gorilla/mux"
 )
 
 func main() {
+
+	repo := repository.NewInMemoryStorage()
+
 	r := mux.NewRouter()
 
-	r.HandleFunc("/", handler.ShortenURL)
-	r.HandleFunc("/{id}", handler.Redirect)
+	shortenHandler := handler.ShortenURL(repo)
+	redirectHandler := handler.Redirect(repo)
+
+	r.HandleFunc("/", shortenHandler.ServeHTTP).Methods(http.MethodPost)
+	r.HandleFunc("/{id}", redirectHandler.ServeHTTP).Methods(http.MethodGet)
 
 	fmt.Println("Started server on http://localhost:8080")
-	if err := http.ListenAndServe(":8080", r); err != nil {
-		panic(err)
-	}
+	log.Fatal(http.ListenAndServe(":8080", r))
 }

@@ -1,15 +1,17 @@
 package main
 
 import (
-	"fmt"
 	"log"
 
+	"github.com/SAgamyradov/yandexService.git/internal/app/config"
 	"github.com/SAgamyradov/yandexService.git/internal/app/handler"
 	"github.com/SAgamyradov/yandexService.git/internal/app/repository"
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
+
+	config.ConfigInit()
 
 	repo := repository.NewInMemoryStorage()
 
@@ -22,6 +24,6 @@ func main() {
 		handler.Redirect(c, repo)
 	})
 
-	fmt.Println("Started server on http://localhost:8080")
-	log.Fatal(r.Run(":8080"))
+	// fmt.Println("Started server on http://localhost:8080")
+	log.Fatal(r.Run(config.Addr))
 }

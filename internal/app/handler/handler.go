@@ -8,49 +8,51 @@ import (
 	"strings"
 
 	"github.com/SAgamyradov/yandexService.git/internal/app/repository"
+	"github.com/gin-gonic/gin"
 )
 
 // POST request
-func ShortenURL(repo repository.URLRepository) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPost {
-			http.Error(w, "Incorrect method", http.StatusBadRequest)
-			return
-		}
-		body, err := io.ReadAll(r.Body)
-		if err != nil {
-			http.Error(w, "Error reading", http.StatusBadRequest)
-			return
-		}
-		longURL := strings.TrimSpace(string(body))
-		if _, err = url.ParseRequestURI(longURL); err != nil {
-			http.Error(w, "Incorrect URL", http.StatusBadRequest)
-			return
-		}
-		shortURL, err := repo.GenerateShortURL(longURL)
-		if err != nil {
-			http.Error(w, "Error saving URL", http.StatusBadRequest)
-			return
-		}
-		w.WriteHeader(http.StatusCreated)
-		w.Header().Set("Content-Type", "text/plain")
-		fmt.Fprintf(w, "http://localhost:8080/%s", shortURL)
-	})
+func ShortenURL(c *gin.Context, repo repository.URLRepository) {
+	if c.Request.Method != http.MethodPost {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect method"})
+		return
+	}
+
+	body, err := io.ReadAll(c.Request.Body)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error reading"})
+		return
+	}
+
+	longURL := strings.TrimSpace(string(body))
+	if _, err = url.ParseRequestURI(longURL); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect URL"})
+		return
+	}
+
+	shortURL, err := repo.GenerateShortURL(longURL)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Error saving URL"})
+		return
+	}
+
+	c.JSON(http.StatusCreated, gin.H{"shortURL": fmt.Sprintf("http://localhost:8080/%s", shortURL)})
 }
 
-func Redirect(repo repository.URLRepository) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		id := r.URL.Path[len("/"):]
-		if id == "" {
-			http.Error(w, "Missing id", http.StatusBadRequest)
-			return
-		}
-		longURL, err := repo.GetLongURL(id)
-		if err != nil {
-			http.Error(w, "failed GET long URL", http.StatusBadRequest)
-			return
-		}
-		w.Header().Set("Location", longURL)
-		w.WriteHeader(http.StatusTemporaryRedirect)
-	})
+// GET request
+func Redirect(c *gin.Context, repo repository.URLRepository) {
+	id := c.Param("id")
+	if id == "" {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Missing id"})
+		return
+	}
+
+	longURL, err := repo.GetLongURL(id)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": "failed GET long URL"})
+		return
+	}
+
+	c.Writer.Header().Set("Location", longURL)
+	c.Writer.WriteHeader(http.StatusTemporaryRedirect)
 }

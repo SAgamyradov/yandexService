@@ -13,7 +13,7 @@ func NewInMemoryStorage() *InMemoryStorage {
 }
 
 func (s *InMemoryStorage) GenerateShortURL(longURL string) (string, error) {
-	shortURL := fmt.Sprintf("%x", len(s.urlMap)+1)
+	shortURL := fmt.Sprintf("%d", len(s.urlMap)+1)
 	s.urlMap[shortURL] = longURL
 	return shortURL, nil
 }

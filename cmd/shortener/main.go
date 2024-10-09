@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/SAgamyradov/yandexService.git/internal/app/config"
@@ -11,7 +12,7 @@ import (
 
 func main() {
 
-	config.ConfigInit()
+	cfg := config.InitConfig()
 
 	repo := repository.NewInMemoryStorage()
 
@@ -24,6 +25,6 @@ func main() {
 		handler.Redirect(c, repo)
 	})
 
-	// fmt.Println("Started server on http://localhost:8080")
-	log.Fatal(r.Run(config.Addr))
+	fmt.Printf("Started server on http://%s\n", cfg.Addr)
+	log.Fatal(r.Run(cfg.Addr))
 }

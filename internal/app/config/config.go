@@ -2,14 +2,19 @@ package config
 
 import "flag"
 
-var (
+type Config struct {
 	Addr    string
 	BaseURL string
-)
+}
 
-func ConfigInit() {
-	flag.StringVar(&Addr, "a", "localhost:8888", "Addr for starting server")
-	flag.StringVar(&BaseURL, "b", "http://localhost:9999", "short basic URL")
+func InitConfig() *Config {
+	addr := flag.String("a", "localhost:8888", "Port for starting HTTP-server")
+	baseURL := flag.String("b", "http://localhost:8000", "Basic addr for short URL")
 
 	flag.Parse()
+
+	return &Config{
+		Addr:    *addr,
+		BaseURL: *baseURL,
+	}
 }

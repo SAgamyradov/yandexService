@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"io"
 	"net/http"
 	"net/url"
@@ -30,13 +29,15 @@ func ShortenURL(c *gin.Context, repo repository.URLRepository) {
 		return
 	}
 
-	shortURL, err := repo.GenerateShortURL(longURL)
+	shortURLId, err := repo.GenerateShortURL(longURL)
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Error saving URL"})
 		return
 	}
 
-	c.JSON(http.StatusCreated, gin.H{"shortURL": fmt.Sprintf("http://localhost:8080/%s", shortURL)})
+	shortURL := "http://localhost:8080/" + shortURLId
+	c.Header("Content-Type", "text/plain")
+	c.String(http.StatusCreated, shortURL)
 }
 
 // GET request

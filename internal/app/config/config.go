@@ -1,20 +1,25 @@
 package config
 
-import "flag"
+import (
+	"flag"
+	"strings"
+)
 
 type Config struct {
-	Addr    string
+	Address string
 	BaseURL string
 }
 
 func InitConfig() *Config {
-	addr := flag.String("a", "localhost:8888", "Port for starting HTTP-server")
-	baseURL := flag.String("b", "http://localhost:8000", "Basic addr for short URL")
+	addr := flag.String("a", "localhost:8888", "Адрес запуска HTTP-сервера")
+	baseURL := flag.String("b", "http://localhost:8888", "Базовый адрес сокращенного URL")
 
 	flag.Parse()
-
+	if !strings.HasSuffix(*baseURL, "/") {
+		*baseURL += "/"
+	}
 	return &Config{
-		Addr:    *addr,
+		Address: *addr,
 		BaseURL: *baseURL,
 	}
 }

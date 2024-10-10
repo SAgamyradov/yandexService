@@ -12,11 +12,16 @@ import (
 
 func main() {
 
-	cfg := config.InitConfig()
-
 	repo := repository.NewInMemoryStorage()
+	appConfig := config.InitConfig()
 
 	r := gin.Default()
+
+	// Middleware to add config to context
+	r.Use(func(c *gin.Context) {
+		c.Set("BaseURL", appConfig.BaseURL) // Add BaseURL to the context
+		c.Next()
+	})
 
 	r.POST("/", func(c *gin.Context) {
 		handler.ShortenURL(c, repo)
@@ -25,6 +30,6 @@ func main() {
 		handler.Redirect(c, repo)
 	})
 
-	fmt.Printf("Started server on http://%s\n", cfg.Addr)
-	log.Fatal(r.Run(cfg.Addr))
+	fmt.Printf("Started server on http://%s\n", appConfig.BaseURL)
+	log.Fatal(r.Run(appConfig.Address))
 }

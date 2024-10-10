@@ -3,11 +3,13 @@ package repository
 import "fmt"
 
 type InMemoryStorage struct {
+	URLRepository
 	urlMap map[string]string
 }
 
 func NewInMemoryStorage() *InMemoryStorage {
 	return &InMemoryStorage{
+
 		urlMap: make(map[string]string),
 	}
 }

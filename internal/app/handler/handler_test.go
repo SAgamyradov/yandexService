@@ -14,6 +14,9 @@ import (
 
 var mockRepo *repository.InMemoryStorage
 
+func init() {
+	mockRepo = repository.NewInMemoryStorage()
+}
 func TestShortenURL(t *testing.T) {
 	t.Run("Should return 201 Created and shortURL", func(t *testing.T) {
 
@@ -122,8 +125,4 @@ func TestRedirect(t *testing.T) {
 			t.Errorf("Expected status code %d, got %d", http.StatusBadRequest, w.Code)
 		}
 	})
-}
-
-func init() {
-	mockRepo = repository.NewInMemoryStorage()
 }

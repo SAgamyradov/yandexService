@@ -34,8 +34,8 @@ func ShortenURL(c *gin.Context, repo repository.URLRepository) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Error saving URL"})
 		return
 	}
-
-	shortURL := "http://localhost:8080/" + shortURLId
+	BaseURL, _ := c.Get("BaseURL")
+	shortURL := BaseURL.(string) + shortURLId
 	c.Header("Content-Type", "text/plain")
 	c.String(http.StatusCreated, shortURL)
 }

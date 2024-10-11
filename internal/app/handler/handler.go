@@ -11,7 +11,7 @@ import (
 )
 
 // POST request
-func ShortenURL(c *gin.Context, repo repository.URLRepository) {
+func ShortenURL(c *gin.Context, repo repository.URLRepository, baseURL string) {
 	if c.Request.Method != http.MethodPost {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect method"})
 		return
@@ -34,8 +34,8 @@ func ShortenURL(c *gin.Context, repo repository.URLRepository) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Error saving URL"})
 		return
 	}
-	BaseURL, _ := c.Get("BaseURL")
-	shortURL := BaseURL.(string) + shortURLId
+
+	shortURL := baseURL + shortURLId
 	c.Header("Content-Type", "text/plain")
 	c.String(http.StatusCreated, shortURL)
 }

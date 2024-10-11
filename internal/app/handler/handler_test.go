@@ -24,10 +24,12 @@ func TestShortenURL(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(longURL))
 		w := httptest.NewRecorder()
 
+		gin.SetMode(gin.TestMode)
 		router := gin.Default()
+		baseURL := "http://localhost:8080/"
 
 		router.POST("/", func(c *gin.Context) {
-			ShortenURL(c, mockRepo)
+			ShortenURL(c, mockRepo, baseURL)
 		})
 
 		router.ServeHTTP(w, req)
@@ -35,7 +37,7 @@ func TestShortenURL(t *testing.T) {
 		if w.Code != http.StatusCreated {
 			t.Errorf("Expected status code %d, got %d", http.StatusCreated, w.Code)
 		}
-		if !strings.Contains(w.Body.String(), "http://localhost:8080/") {
+		if !strings.Contains(w.Body.String(), baseURL) {
 			t.Errorf("Response body should contain shortURL")
 		}
 	})
@@ -49,7 +51,7 @@ func TestShortenURL(t *testing.T) {
 		router := gin.Default()
 
 		router.POST("/", func(c *gin.Context) {
-			ShortenURL(c, mockRepo)
+			ShortenURL(c, mockRepo, "")
 		})
 
 		router.ServeHTTP(w, req)

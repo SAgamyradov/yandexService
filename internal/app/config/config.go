@@ -11,8 +11,8 @@ type Config struct {
 }
 
 func InitConfig() *Config {
-	addr := flag.String("a", "localhost:8888", "Адрес запуска HTTP-сервера")
-	baseURL := flag.String("b", "http://localhost:8888", "Базовый адрес сокращенного URL")
+	addr := flag.String("a", "localhost:8080", "Адрес запуска HTTP-сервера")
+	baseURL := flag.String("b", "http://localhost:8080/", "baseURL address for short")
 
 	flag.Parse()
 	if !strings.HasSuffix(*baseURL, "/") {

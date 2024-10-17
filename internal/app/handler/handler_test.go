@@ -8,28 +8,28 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/SAgamyradov/yandexService.git/internal/app/repository"
 	"github.com/gin-gonic/gin"
+
+	"github.com/SAgamyradov/yandexService.git/internal/app/config"
+	"github.com/SAgamyradov/yandexService.git/internal/app/repository"
+	"github.com/SAgamyradov/yandexService.git/internal/app/service"
 )
 
-var mockRepo *repository.InMemoryStorage
-
-func init() {
-	mockRepo = repository.NewInMemoryStorage()
-}
 func TestShortenURL(t *testing.T) {
 	t.Run("Should return 201 Created and shortURL", func(t *testing.T) {
 
 		longURL := "https://www.google.com"
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(longURL))
 		w := httptest.NewRecorder()
-
+		cfg := &config.Config{BaseURL: "http://localhost:8080"}
+		mockRepo := repository.NewInMemoryStorage()
 		gin.SetMode(gin.TestMode)
 		router := gin.Default()
-		baseURL := "http://localhost:8080/"
+
+		urlService := service.NewURLService(mockRepo, cfg)
 
 		router.POST("/", func(c *gin.Context) {
-			ShortenURL(c, mockRepo, baseURL)
+			ShortenURL(c, urlService)
 		})
 
 		router.ServeHTTP(w, req)
@@ -37,7 +37,7 @@ func TestShortenURL(t *testing.T) {
 		if w.Code != http.StatusCreated {
 			t.Errorf("Expected status code %d, got %d", http.StatusCreated, w.Code)
 		}
-		if !strings.Contains(w.Body.String(), baseURL) {
+		if !strings.Contains(w.Body.String(), cfg.BaseURL) {
 			t.Errorf("Response body should contain shortURL")
 		}
 	})
@@ -47,11 +47,14 @@ func TestShortenURL(t *testing.T) {
 		longURL := "invalid-url"
 		req := httptest.NewRequest(http.MethodPost, "/", bytes.NewBufferString(longURL))
 		w := httptest.NewRecorder()
+		cfg := &config.Config{BaseURL: "http://localhost:8080"}
+		mockRepo := repository.NewInMemoryStorage()
 
 		router := gin.Default()
+		urlService := service.NewURLService(mockRepo, cfg)
 
 		router.POST("/", func(c *gin.Context) {
-			ShortenURL(c, mockRepo, "")
+			ShortenURL(c, urlService)
 		})
 
 		router.ServeHTTP(w, req)
@@ -66,6 +69,7 @@ func TestRedirect(t *testing.T) {
 	t.Run("Should return 307 Temporary Redirect and redirect to longURL", func(t *testing.T) {
 
 		longURL := "https://www.google.com"
+		mockRepo := repository.NewInMemoryStorage()
 		shortURL, err := mockRepo.GenerateShortURL(longURL)
 		if err != nil {
 			t.Fatal(err)
@@ -73,11 +77,14 @@ func TestRedirect(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodGet, fmt.Sprintf("/%s", shortURL), nil)
 		w := httptest.NewRecorder()
+		cfg := &config.Config{BaseURL: "http://localhost:8080"}
 
 		router := gin.Default()
 
+		urlService := service.NewURLService(mockRepo, cfg)
+
 		router.GET("/:id", func(c *gin.Context) {
-			Redirect(c, mockRepo)
+			Redirect(c, urlService)
 		})
 
 		router.ServeHTTP(w, req)
@@ -94,11 +101,14 @@ func TestRedirect(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodGet, "/:id", nil)
 		w := httptest.NewRecorder()
+		cfg := &config.Config{BaseURL: "http://localhost:8080"}
+		mockRepo := repository.NewInMemoryStorage()
 
 		router := gin.Default()
+		urlService := service.NewURLService(mockRepo, cfg)
 
 		router.GET("/:id", func(c *gin.Context) {
-			Redirect(c, mockRepo)
+			Redirect(c, urlService)
 		})
 		router.GET("/", func(c *gin.Context) {})
 
@@ -113,11 +123,14 @@ func TestRedirect(t *testing.T) {
 
 		req := httptest.NewRequest(http.MethodGet, "/non-existent-id", nil)
 		w := httptest.NewRecorder()
+		cfg := &config.Config{BaseURL: "http://localhost:8080"}
+		mockRepo := repository.NewInMemoryStorage()
 
 		router := gin.Default()
+		urlService := service.NewURLService(mockRepo, cfg)
 
 		router.GET("/:id", func(c *gin.Context) {
-			Redirect(c, mockRepo)
+			Redirect(c, urlService)
 		})
 		router.GET("/", func(c *gin.Context) {})
 

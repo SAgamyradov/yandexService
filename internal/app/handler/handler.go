@@ -14,6 +14,7 @@ import (
 
 // POST request
 func ShortenURL(c *gin.Context, urlService *service.URLServiceImpl) {
+
 	if c.Request.Method != http.MethodPost {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "Incorrect method"})
 		return
@@ -58,6 +59,6 @@ func Redirect(c *gin.Context, urlService *service.URLServiceImpl) {
 	c.Writer.Header().Set("Location", longURL)
 	fmt.Printf("Setting Location header to: %s\n", longURL)
 	c.Writer.WriteHeader(http.StatusTemporaryRedirect)
-	fmt.Printf("Writing status code: %d\n", http.StatusTemporaryRedirect) // Add logging
+	fmt.Printf("Writing status code: %d\n", http.StatusTemporaryRedirect)
 
 }

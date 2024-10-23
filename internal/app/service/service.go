@@ -8,15 +8,11 @@ import (
 	"github.com/SAgamyradov/yandexService.git/internal/app/repository"
 )
 
-// URLService интерфейс для обработки URLs
-
-// URLService реализация интерфейса URLService
 type URLServiceImpl struct {
 	Repo    repository.URLRepository
 	BaseURL string
 }
 
-// Конструктор для URLServiceImpl
 func NewURLService(repo repository.URLRepository, cfg *config.Config) *URLServiceImpl {
 	return &URLServiceImpl{
 		Repo:    repo,

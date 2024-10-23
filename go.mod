@@ -2,7 +2,10 @@ module github.com/SAgamyradov/yandexService.git
 
 go 1.22.8
 
-require github.com/gin-gonic/gin v1.10.0
+require (
+	github.com/gin-gonic/gin v1.10.0
+	github.com/sirupsen/logrus v1.9.3
+)
 
 require (
 	github.com/bytedance/sonic v1.12.3 // indirect
